@@ -1,5 +1,5 @@
 import {StatusBar} from 'expo-status-bar';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {Alert, FlatList, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
 import {useState} from "react";
 import Header from './components/header'
 import TodoItem from "./components/todoItem";
@@ -18,28 +18,42 @@ export default function App() {
     }
 
     const submitHandler = (text) => {
-        setTodo((prevTodo) => {
-            return [ /* ... => everything in prevTodo , I mean everything store and add also this text  */
-                {text: text, key: Math.random().toString()},
-                ...prevTodo
-            ]
-        })
+        if (text.length > 3) {
+            setTodo((prevTodo) => {
+                return [ /* ... => everything in prevTodo , I mean everything store and add also this text  */
+                    {text: text, key: Math.random().toString()},
+                    ...prevTodo
+                ]
+            })
+        } else {
+            Alert.alert('OOPS!', 'Todo must be over 3 chars long', [{
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+            },
+                {text: "OK", onPress: () => console.log("OK Pressed")}])
+        }
     }
     return (
-        <View style={styles.container}>
-            {/*header*/}
-            <Header/>
-            <View style={styles.content}>
-                {/* to form */}
-                <AddTodo submitHandler={submitHandler}/>
-                <View style={styles.list}>
-                    <FlatList keyExtractor={((item, index) => item.key)} data={todo} renderItem={({item}) => (
-                        // <Text>{item.text}</Text>
-                        <TodoItem index={item} pressHandler={pressHandler} />
-                    )}/>
+        <TouchableWithoutFeedback onPress={() => {
+            console.log('dismiss')
+            Keyboard.dismiss();
+        }}>
+            <View style={styles.container}>
+                {/*header*/}
+                <Header/>
+                <View style={styles.content}>
+                    {/* to form */}
+                    <AddTodo submitHandler={submitHandler}/>
+                    <View style={styles.list}>
+                        <FlatList keyExtractor={((item, index) => item.key)} data={todo} renderItem={({item}) => (
+                            // <Text>{item.text}</Text>
+                            <TodoItem index={item} pressHandler={pressHandler}/>
+                        )}/>
+                    </View>
                 </View>
             </View>
-        </View>
+        </TouchableWithoutFeedback>
     );
 }
 
